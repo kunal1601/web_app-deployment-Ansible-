@@ -1,0 +1,58 @@
+---
+- name: Build and Push Docker Image from EC2 A
+  hosts: localhost
+  become: true
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Set image tag dynamically
+      ansible.builtin.set_fact:
+        image_tag: "{{ ansible_date_time.epoch }}"
+
+    - name: Build Docker image
+      community.docker.docker_image:
+        build:
+          path: ../web_app
+        name: "{{ dockerhub_username }}/{{ image_name }}"
+        tag: latest
+        source: build
+    - name: DockerHub login
+      community.docker.docker_login:
+        username: "{{ dockerhub_username }}"
+        password: "{{ dockerhub_password }}"
+
+    - name: Push Docker image to DockerHub
+      community.docker.docker_image:
+        name: "{{ dockerhub_username }}/{{ image_name }}"
+        tag: latest
+        push: true
+        source: local
+
+- name: Deploy Kubernetes App on EC2 B
+  hosts: all
+  become: true
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Generate deploy.yml from template
+      ansible.builtin.template:
+        src: ../k8s/deploy.yml.j2
+        dest: /tmp/deploy.yml
+
+    - name: Generate service.yml from template
+      ansible.builtin.template:
+        src: ../k8s/service.yml.j2
+        dest: /tmp/service.yml
+
+    - name: Apply Kubernetes Deployment
+      ansible.builtin.command: kubectl apply -f /tmp/deploy.yml
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+
+    - name: Apply Kubernetes Service
+      ansible.builtin.command: kubectl apply -f /tmp/service.yml
+      environment:
+        KUBECONFIG: /etc/kubernetes/admin.conf
+
