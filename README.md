@@ -13,5 +13,5 @@ ansible-k8s-web_app
 └── web_app/ # Flask Web App (app.py, Dockerfile, requirements.txt)
 
 
-[LinkedIn url]()
+Read the complete article: [LinkedIn](https://www.linkedin.com/pulse/deployed-dockerized-web-app-using-ansible-playbook-cluster-sharma-66xcc/?trackingId=oMdziKf82JbTg2FNMjLYGA%3D%3D)
 
