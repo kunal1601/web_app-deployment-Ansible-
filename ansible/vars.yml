@@ -1,5 +1,5 @@
-dockerhub_username: "kunal0816"
-dockerhub_password: "Kun@l1601"
+dockerhub_username: "Your_username"
+dockerhub_password: "Your_Password"
 image_name: "flask-k8s-app"
 
 
